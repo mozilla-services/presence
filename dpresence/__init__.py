@@ -1,6 +1,10 @@
-from json import dumps
+from json import dumps, loads
 import os
+import browserid
+import beaker.middleware
 
+
+from bottle import ServerAdapter
 import bottle
 from bottle import *
 from bottle.ext.tornadosocket import TornadoWebSocketServer
@@ -46,18 +50,53 @@ class Dispatcher(object):
 
 
 dispatcher = Dispatcher()
+session_opts = {
+    'session.type': 'file',
+    'session.data_dir': './session/',
+    'session.auto': True,
+    }
+
+STATIC = os.path.abspath(os.path.join(os.path.dirname(__file__), 'static'))
+
+verifier = browserid.LocalVerifier(['*'])
 
 
 @get('/')
 @view('index')
 def index():
-    return {'title': 'Presence Handler'}
+    return {'title': 'Presence Handler',
+            'session': request.environ.get('beaker.session')}
 
 
 @get('/admin')
 @view('admin')
 def admin():
     return {'title': 'Presence Handler', 'presence': dispatcher}
+
+@route('/login', method='POST')
+def login():
+    assertion = request.POST['assertion']
+    try:
+        data = verifier.verify(assertion, '*')
+        email = data['email']
+        app_session = request.environ.get('beaker.session')
+        app_session['logged_in'] = True
+        app_session['email'] = email
+        app_session['assertion'] = assertion
+        app_session.save()
+    except ValueError, UnicodeDecodeError:
+        # need to raise a auth
+        pass
+    return {'email': email}
+
+
+@route('/logout', method='POST')
+def logout():
+    app_session = request.environ.get('beaker.session')
+    app_session['logged_in'] = False
+    app_session['email'] = None
+    redirect("/")
+
 
 
 class AdminHandler(tornado.websocket.WebSocketHandler):
@@ -68,39 +107,29 @@ class AdminHandler(tornado.websocket.WebSocketHandler):
         dispatcher.unsubscribe_events(self._event)
 
     def _event(self, event):
+        print event
         # sends events as they come (status changes in presence)
         self.write_message(dumps(event))
 
 
 class PresenceHandler(tornado.websocket.WebSocketHandler):
-    clients = []
-    unique_id = 0
 
-    @classmethod
-    def get_username(cls):
-        cls.unique_id += 1
-        return 'User%d' % cls.unique_id
-
-    def open(self):
-        self.username = self.get_username()
-        dispatcher.add_client(self)
-        self.write_message(dumps({"status": "online",
-                                  "user": self.username}))
+    def get_username(self):
+        return self.user
 
     def on_message(self, message):
-        user = self.get_username()
+        message = loads(message)
+        self.user = user = message['user']
+        status = message['status']
 
-        if message == 'online':
-            dispatcher.add_client(self)
-            self.write_message(dumps({"status": "online",
+        if status in ('online', 'offline'):
+            if status == 'online':
+                dispatcher.add_client(self)
+            else:
+                dispatcher.remove_client(self)
+
+            self.write_message(dumps({"status": status,
                                       "user": user}))
-        elif message == 'offline':
-            dispatcher.remove_client(self)
-            self.write_message(dumps({"status": "offline",
-                                      "user": user}))
-        elif message == 'list':
-            data = {'users': dispatcher.clients}
-            self.write_message(dumps(data))
         else:
             self.write_message(dumps({"status": "error",
                                       "user": user}))
@@ -108,6 +137,25 @@ class PresenceHandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
         dispatcher.remove_client(self)
 
+
+class TornadoWebSocketServer(ServerAdapter):
+    def run(self, handler): # pragma: no cover
+        import tornado.wsgi, tornado.httpserver, tornado.ioloop
+        wsgiapp = beaker.middleware.SessionMiddleware(handler[0])
+        wsgi_handler = tornado.wsgi.WSGIContainer(wsgiapp)
+
+        default_handlers = [
+            (r".*", tornado.web.FallbackHandler, {'fallback': wsgi_handler})
+        ]
+
+        if self.options['handlers'] is not None and isinstance(self.options['handlers'], list):
+            handlers = list(self.options['handlers']) + list(default_handlers)
+        else:
+            handlers = default_handlers
+
+        tornado_app = tornado.web.Application(handlers)
+        tornado.httpserver.HTTPServer(tornado_app).listen(self.port)
+        tornado.ioloop.IOLoop.instance().start()
 
 
 def main(port=8080, reloader=True):
@@ -117,5 +165,5 @@ def main(port=8080, reloader=True):
         (r"/js/(.*)", tornado.web.StaticFileHandler,
          {"path": os.path.join(STATIC, 'js')}),
     ]
-    run(port=port, reloader=reloader,
+    run(port=port, reloader=reloader, app=app,
         server=TornadoWebSocketServer, handlers=tornado_handlers)

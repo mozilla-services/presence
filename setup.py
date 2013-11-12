@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 
-install_requires = ['bottle-tornadosocket', 'bottle', 'tornado']
+install_requires = ['bottle-tornadosocket', 'bottle', 'tornado',
+                    'PyBrowserID', 'beaker']
 
 
 setup(name='dummy-presence',
