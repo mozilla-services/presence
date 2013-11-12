@@ -5,52 +5,42 @@
   <title>{{title}}</title>
   <script src="/js/jquery-1.7.2.min.js"></script>
   <script src="/js/persona.js"></script>
-  <script>
-  $(function() {
-
-    var ws = new WebSocket('ws://localhost:8080/presence');
-      ws.onmessage = function(evt) {
-        var data = jQuery.parseJSON(evt.data);
-        $('#status').text(data.status);
-      };
-
-    $('#online').click(function(){
-      ws.send(JSON.stringify({'status': 'online', 'user': currentUser}));
-    });
-    $('#offline').click(function(){
-      ws.send(JSON.stringify({'status': 'offline', 'user': currentUser}));
-    });
-
-  });
-  </script>
 </head>
 <body>
+  <fieldset>
+    <legend>Login</legend>
     %if session.get('logged_in'):
     <div>
-      Logged in as <span id="user">{{session['email']}}</span>
-    </div>
-    <div>
+      <strong>Logged in as <span id="user">{{session['email']}}</span></strong>
       <button id="signout">Sign Out</button>
     </div>
 
 
     %else:
     <div>
-      Logged in as <span id="user">no one</span>
-    </div>
+      <strong>Logged in as <span id="user">no one</span></strong>
 
-    <div>
       <button id="signin">Sign In</button>
       <button id="signout" style="display: none">Sign Out</button>
     </div>
 
     %end
+  </fieldset>
+  <fieldset>
+    <legend>Status</legend>
 
-  <div id="status">offline</div>
   <div>
-    <button id="online">Online</button>
-    <button id="offline">Offline</button>
+    <strong id="status">offline</strong>
+    <button id="online">Go Online</button>
+    <button id="offline">Go Offline</button>
   </div>
+
+  </fieldset>
+  <fieldset>
+    <legend>Apps permissions</legend>
+
+  </fieldset>
+
 <script>
       var signinLink = document.getElementById('signin');
       if (signinLink) {
@@ -70,6 +60,20 @@ var currentUser = null;
 %end
 
 
+    var ws = new WebSocket('ws://localhost:8080/presence');
+      ws.onmessage = function(evt) {
+        var data = jQuery.parseJSON(evt.data);
+        $('#status').text(data.status);
+      };
+
+    $('#online').click(function(){
+      ws.send(JSON.stringify({'status': 'online', 'user': currentUser}));
+    });
+    $('#offline').click(function(){
+      ws.send(JSON.stringify({'status': 'offline', 'user': currentUser}));
+    });
+
+
 
 navigator.id.watch({
   loggedInUser: currentUser,
@@ -80,6 +84,7 @@ navigator.id.watch({
       dataType: 'json',
       data: {assertion: assertion},
       success: function(res, status, xhr) {
+        console.log('success');
         $('#signin').hide();
         $('#signout').show();
         $('#user').text(res.email);
@@ -96,6 +101,8 @@ navigator.id.watch({
       type: 'POST',
       url: '/logout', // This is a URL on your website.
       success: function(res, status, xhr) {
+        console.log('success logout');
+
         window.location.reload(); },
       error: function(xhr, status, err) { alert("Logout failure: " + err); }
     });

@@ -32,11 +32,13 @@ class Dispatcher(object):
         self.clients.append(client)
 
     def remove_client(self, client):
-        evt = {'user': client.get_username(),
+        user = client.get_username()
+        evt = {'user': user,
                'status': 'offline'}
         for sub in self.subscribe:
             sub(evt)
-        self.clients.remove(client)
+        if client in self.clients:
+            self.clients.remove(client)
 
     def broadcast(self, message):
         for c in self.clients:
@@ -113,13 +115,16 @@ class AdminHandler(tornado.websocket.WebSocketHandler):
 
 
 class PresenceHandler(tornado.websocket.WebSocketHandler):
+    def __init__(self, *args, **kw):
+        tornado.websocket.WebSocketHandler.__init__(self, *args, **kw)
+        self._user = None
 
     def get_username(self):
-        return self.user
+        return self._user
 
     def on_message(self, message):
         message = loads(message)
-        self.user = user = message['user']
+        self._user = user = message['user']
         status = message['status']
 
         if status in ('online', 'offline'):
