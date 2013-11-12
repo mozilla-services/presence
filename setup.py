@@ -14,5 +14,9 @@ setup(name='dummy-presence',
       classifiers=[
           "Programming Language :: Python",
       ],
+      entry_points="""
+      [console_scripts]
+      presence = dpresence:main
+      """,
       install_requires=install_requires)
 

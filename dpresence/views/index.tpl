@@ -14,11 +14,17 @@
 					}
 				}
 
-				var ws = new WebSocket('ws://localhost:8080/++presence++');
+				var ws = new WebSocket('ws://localhost:8080/presence');
+                    ws.onmessage = function(evt) {
+                    $('#msg').val($('#msg').val() + '\n' + evt.data);
+               };
+
 			});
 		</script>
 	</head>
-	<body>Presence notified to the server.
+	<body>
+
+       <textarea id="msg" style="width: 100%; height: 200px" readonly></textarea>
 	</body>
 </html>
 
