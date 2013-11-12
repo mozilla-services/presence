@@ -1,3 +1,4 @@
+from json import dumps
 import os
 
 import bottle
@@ -57,12 +58,26 @@ class PresenceHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         self.username = self.get_username()
         dispatcher.add_client(self)
-        self.write_message("You are now appearing online.")
+        self.write_message(dumps({"status": "online",
+                                  "user": self.username}))
 
     def on_message(self, message):
-        if message == '/quit':
+        user = self.get_username()
+
+        if message == 'online':
+            dispatcher.add_client(self)
+            self.write_message(dumps({"status": "online",
+                                      "user": user}))
+        elif message == 'offline':
             dispatcher.remove_client(self)
-            self.close()
+            self.write_message(dumps({"status": "offline",
+                                      "user": user}))
+        elif message == 'list':
+            data = {'users': dispatcher.clients}
+            self.write_message(dumps(data))
+        else:
+            self.write_message(dumps({"status": "error",
+                                      "user": user}))
 
     def on_close(self):
         dispatcher.remove_client(self)
