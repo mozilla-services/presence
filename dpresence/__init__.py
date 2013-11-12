@@ -18,16 +18,31 @@ debug(True)
 class Dispatcher(object):
     def __init__(self):
         self.clients = []
+        self.subscribe = []
 
     def add_client(self, client):
+        evt = {'user': client.get_username(),
+               'status': 'online'}
+        for sub in self.subscribe:
+            sub(evt)
         self.clients.append(client)
 
     def remove_client(self, client):
+        evt = {'user': client.get_username(),
+               'status': 'offline'}
+        for sub in self.subscribe:
+            sub(evt)
         self.clients.remove(client)
 
     def broadcast(self, message):
         for c in self.clients:
             c.write_message(message)
+
+    def subscribe_events(self, handler):
+        self.subscribe.append(handler)
+
+    def unsubscribe_events(self, handler):
+        self.subscribe.remove(handler)
 
 
 dispatcher = Dispatcher()
@@ -44,6 +59,17 @@ def index():
 def admin():
     return {'title': 'Presence Handler', 'presence': dispatcher}
 
+
+class AdminHandler(tornado.websocket.WebSocketHandler):
+    def open(self):
+        dispatcher.subscribe_events(self._event)
+
+    def on_close(self):
+        dispatcher.unsubscribe_events(self._event)
+
+    def _event(self, event):
+        # sends events as they come (status changes in presence)
+        self.write_message(dumps(event))
 
 
 class PresenceHandler(tornado.websocket.WebSocketHandler):
@@ -87,6 +113,7 @@ class PresenceHandler(tornado.websocket.WebSocketHandler):
 def main(port=8080, reloader=True):
     tornado_handlers = [
         (r"/presence", PresenceHandler),
+        (r"/_admin", AdminHandler),
         (r"/js/(.*)", tornado.web.StaticFileHandler,
          {"path": os.path.join(STATIC, 'js')}),
     ]
