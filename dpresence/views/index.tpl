@@ -42,6 +42,7 @@
 
   </fieldset>
 
+  <div><a href="/admin">Admin</a></div>
 <script>
       var signinLink = document.getElementById('signin');
       if (signinLink) {
