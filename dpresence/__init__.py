@@ -89,7 +89,7 @@ class TornadoWebSocketServer(ServerAdapter):
         tornado.ioloop.IOLoop.instance().start()
 
 
-def main(port=8080, reloader=True):
+def main(port=8282, reloader=True):
     tornado_handlers = [
         (r"/presence", PresenceHandler),
         (r"/_admin", AdminHandler),
