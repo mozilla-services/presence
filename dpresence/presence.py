@@ -29,6 +29,3 @@ class Presence(object):
 
     def unsubscribe_events(self, handler):
         self.subscribe.remove(handler)
-
-
-
