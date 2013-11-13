@@ -7,6 +7,7 @@
   <script src="/js/persona.js"></script>
 </head>
 <body>
+  <h1>Mozilla Presence</h1>
   <fieldset>
     <legend>Login</legend>
     %if session.get('logged_in'):
