@@ -1,0 +1,36 @@
+
+body {
+  width: 300px; 
+  height: 400px;
+  background: #fdfdfd;
+  margin: 4px;
+}
+
+#user {
+
+}
+
+header {
+  padding: 4px 10px;
+  background: #F5F1E8;
+  border-bottom: 1px solid #ccc;
+}
+
+#signin img {
+  width: 185px;
+  height: 25px;
+}
+
+.title {
+  margin-top: 0;
+  font-size: 20px;
+  font-weight: normal;
+  color: #818A8F;
+}
+
+div.status {
+  margin: 15px;
+  margin-left: 2px;
+  font-size: 20pt;
+  color: #818A8F;
+}

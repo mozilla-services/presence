@@ -97,6 +97,8 @@ def main(port=8282, reloader=True):
          {"path": os.path.join(STATIC, 'js')}),
         (r"/img/(.*)", tornado.web.StaticFileHandler,
          {"path": os.path.join(STATIC, 'img')}),
+        (r"/css/(.*)", tornado.web.StaticFileHandler,
+         {"path": os.path.join(STATIC, 'css')}),
 
     ]
 

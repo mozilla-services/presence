@@ -6,58 +6,47 @@
   <script src="/js/jquery-1.7.2.min.js"></script>
   <script src="/js/persona.js"></script>
   <script src="/js/browserDetection.js"></script>
+  <link rel="stylesheet" media="all" href="/css/presence.css"/>
+
 </head>
-<body>
-  <h1>Mozilla Presence</h1>
+<body style="width: 300px; height: 400px">
+<header id="login">
+  <h1 class="title">Mozilla Presence</h1>
+  <span id="user">{{session.get('email', '')}}</span>
 
-  <fieldset>
-    <legend>Login</legend>
-    %if session.get('logged_in'):
     <div>
-      <strong>Logged in as <span id="user">{{session['email']}}</span></strong>
+      <p>
+%if session.get('logged_in'):
+        <a href="#" id="signin" style="display: none">
+          <img src="/img/persona_sign_in_blue.png" alt="Sign in with Persona">
+        </a>
+%else:
+        <a href="#" id="signin">
+          <img src="/img/persona_sign_in_blue.png" alt="Sign in with Persona">
+        </a>
+
+%end
+      </p>
+    </div>
+%if session.get('logged_in'):
       <button id="signout">Sign Out</button>
-    </div>
-
-
-    %else:
-    <div>
-      <strong>Logged in as <span id="user">no one</span></strong>
-
-      <button id="signin">Sign In</button>
+%else:
       <button id="signout" style="display: none">Sign Out</button>
-    </div>
+%end
+</header>
 
-    %end
-  </fieldset>
-  <fieldset>
-    <legend>Status</legend>
-
-  <div>
-    <strong id="status">offline</strong>
+%if session.get('logged_in'):
+  <div class="status"><span id="status">offline</span></div>
+%else:
+  <div class="status" style="display: none"><span id="status">offline</span>
+%end
+   <div>
     <button id="online">Go Online</button>
     <button id="offline">Go Offline</button>
+   </div>
   </div>
 
-  </fieldset>
-  <fieldset>
-    <legend>Presence Requests</legend>
-    <strong>XXX list of your presence authorization requests to authorize or ignore</strong>
-  </fieldset>
-
-
-  <fieldset>
-    <legend>Apps permissions</legend>
-    <strong>XXX list of apps and their permissions - with a revoke button</strong>
-  </fieldset>
-
-  <fieldset>
-    <legend>My apps</legend>
-    <strong>XXX list of your own apps with their API keys.</strong>
-  </fieldset>
-
-
-  <div><a href="/admin">Admin</a></div>
-<script>
+  <script>
       var signinLink = document.getElementById('signin');
       if (signinLink) {
           signinLink.onclick = function() { navigator.id.request(); };
@@ -102,6 +91,7 @@ navigator.id.watch({
       success: function(res, status, xhr) {
         console.log('success');
         $('#signin').hide();
+        $('div.status').show();
         $('#signout').show();
         $('#user').text(res.email);
         currentUser = res.email;
