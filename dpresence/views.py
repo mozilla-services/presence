@@ -7,6 +7,12 @@ def index():
     return {'title': 'Mozilla Presence',
             'session': request.environ.get('beaker.session')}
 
+@get('/sidebar')
+@view('sidebar')
+def sidebar():
+    return {'title': 'Mozilla Presence',
+            'session': request.environ.get('beaker.session')}
+
 
 @get('/admin')
 @view('admin')

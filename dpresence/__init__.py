@@ -95,6 +95,9 @@ def main(port=8282, reloader=True):
         (r"/_admin", AdminHandler),
         (r"/js/(.*)", tornado.web.StaticFileHandler,
          {"path": os.path.join(STATIC, 'js')}),
+        (r"/img/(.*)", tornado.web.StaticFileHandler,
+         {"path": os.path.join(STATIC, 'img')}),
+
     ]
 
     app.dispatcher = Presence()
