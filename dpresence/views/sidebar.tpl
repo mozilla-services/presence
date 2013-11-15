@@ -36,7 +36,7 @@
 </header>
 
 %if session.get('logged_in'):
-  <div class="status"><span id="status">offline</span></div>
+  <div class="status"><span id="status">offline</span>
 %else:
   <div class="status" style="display: none"><span id="status">offline</span>
 %end
@@ -89,7 +89,6 @@ navigator.id.watch({
       dataType: 'json',
       data: {assertion: assertion},
       success: function(res, status, xhr) {
-        console.log('success');
         $('#signin').hide();
         $('div.status').show();
         $('#signout').show();
@@ -107,9 +106,12 @@ navigator.id.watch({
       type: 'POST',
       url: '/logout', // This is a URL on your website.
       success: function(res, status, xhr) {
-        console.log('success logout');
-
-        window.location.reload(); },
+        $('#signin').show();
+        $('div.status').hide();
+        $('#signout').hide();
+        $('#user').text('');
+        currentUser = null;
+      },
       error: function(xhr, status, err) { alert("Logout failure: " + err); }
     });
   }
