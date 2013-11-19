@@ -10,3 +10,10 @@ def myapps():
     #
     return {'title': 'Mozilla Presence',
             'session': request.environ.get('beaker.session')}
+
+@post('/myapps')
+def post_app():
+    # XXX receives a new app to add
+    pass
+
+

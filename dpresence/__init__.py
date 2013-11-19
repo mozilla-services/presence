@@ -14,7 +14,7 @@ from dpresence.presence import Presence
 
 STATIC = os.path.join(os.path.dirname(__file__), 'static')
 bottle.TEMPLATE_PATH = [os.path.join(os.path.dirname(__file__),
-                                     'views')]
+                                     'templates')]
 
 debug(True)
 
