@@ -7,8 +7,7 @@ from bottle.ext import sqlalchemy
 
 
 Base = declarative_base()
-engine = create_engine('sqlite:///:memory:', echo=True)
-
+engine = create_engine('sqlite:////tmp/presence.db', echo=True)
 db_plugin = sqlalchemy.Plugin(engine, Base.metadata, keyword='db',
                               create=True, commit=True, use_kwargs=False)
 
@@ -24,7 +23,7 @@ class Application(Base):
     name = Column(String(200))
     description = Column(Text())
     email = Column(String(200))
-    domain = Column(String(200)
+    domain = Column(String(200))
     notified = Column(Boolean)
     api_key = Column(String(200))
 

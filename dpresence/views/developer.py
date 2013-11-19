@@ -1,4 +1,4 @@
-from bottle import get, view, app, request, redirect, route
+from bottle import get, view, app, request, redirect, route, post
 
 
 @get('/myapps')

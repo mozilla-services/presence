@@ -107,7 +107,7 @@ def main(port=8282, reloader=True):
 
     # installing sqlalchemy plugin
     from dpresence.database import db_plugin
-    app.install(db_plugin)
+    app[0].install(db_plugin)
 
     # importing all views
     from dpresence import views
