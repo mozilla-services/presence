@@ -49,7 +49,8 @@ var browserDetection = (function ($) {
       // should be available for display purposes
       "description": "Presence Services",
       "author": "Mozilla",
-      "homepageURL": "https://wiki.mozilla.org/Services/Presence"
+      "homepageURL": "https://wiki.mozilla.org/Services/Presence",
+      "userName": "Some user"
     };
 
     var event = new CustomEvent("ActivateSocialFeature");
