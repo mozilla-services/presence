@@ -1,6 +1,6 @@
 
 body {
-  width: 300px; 
+  width: 300px;
   height: 400px;
   background: #fdfdfd;
   margin: 4px;
@@ -33,4 +33,38 @@ div.status {
   margin-left: 2px;
   font-size: 20pt;
   color: #818A8F;
+}
+
+div.app h4, div.add h4 {
+  font-size: 20px;
+  font-weight: normal;
+  color: #818A8F;
+  border-bottom: 1px solid #818A8F;
+}
+
+div.app p {
+  font-style: italic;
+}
+
+div.app, div.add {
+  padding: 5px;
+  border: 1px solid gray;
+}
+
+form div {
+ margin-bottom: 5px;
+
+}
+
+label {
+ width: 4em;
+ float: left;
+ text-align: right;
+ margin-right: 1.5em;
+ display: block
+}
+
+.submit input {
+  margin-right: 4em;
+  float: right;
 }

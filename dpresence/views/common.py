@@ -1,6 +1,11 @@
 from bottle import get, view, app, request, redirect, route
 
 
+def get_user():
+    session = request.environ.get('beaker.session')
+    return session.get('email')
+
+
 @route('/login', method='POST')
 def login():
     assertion = request.POST['assertion']

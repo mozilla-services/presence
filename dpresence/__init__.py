@@ -72,7 +72,13 @@ class PresenceHandler(tornado.websocket.WebSocketHandler):
 class TornadoWebSocketServer(ServerAdapter):
     def run(self, handler): # pragma: no cover
         import tornado.wsgi, tornado.httpserver, tornado.ioloop
+        # installing sqlalchemy plugin
+        from dpresence.database import db_plugin
+
+        wsgiapp = handler[0]
+        wsgiapp.install(db_plugin)
         wsgiapp = beaker.middleware.SessionMiddleware(handler[0])
+
         wsgi_handler = tornado.wsgi.WSGIContainer(wsgiapp)
 
         default_handlers = [
@@ -104,10 +110,6 @@ def main(port=8282, reloader=True):
 
     app.dispatcher = Presence()
     app.verifier = browserid.LocalVerifier(['*'])
-
-    # installing sqlalchemy plugin
-    from dpresence.database import db_plugin
-    app[0].install(db_plugin)
 
     # importing all views
     from dpresence import views
