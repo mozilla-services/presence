@@ -81,6 +81,7 @@
   </div>
 %end
 
+%if session.get('logged_in'):
 <div class="add">
   <h4>Add a new app</h4>
 
@@ -104,6 +105,8 @@
    <div style="clear: both"></div>
   </form>
 </div>
+%end
+
   <script>
       var signinLink = document.getElementById('signin');
       if (signinLink) {
@@ -135,6 +138,8 @@ navigator.id.watch({
         $('#signout').show();
         $('#user').text(res.email);
         currentUser = res.email;
+        console.log('login');
+        location.reload();
       },
       error: function(xhr, status, err) {
         navigator.id.logout();
@@ -151,6 +156,10 @@ navigator.id.watch({
         $('#signout').hide();
         $('#user').text('');
         currentUser = null;
+        console.log('logout');
+
+        //location.reload();
+        window.location.replace("/");
       },
       error: function(xhr, status, err) { alert("Logout failure: " + err); }
     });
