@@ -38,6 +38,31 @@
   <div class="app">
   <h4>{{app.name}}</h4>
   <p>{{app.description}}</p>
+  <div>Domain: <a href="{{app.domain}}">{{app.domain}}</a></div>
+  %if app.valid_domain:
+  <div>
+    API Key:
+    <pre>{{app.api_key}}</pre>
+  </div>
+  <div>
+  <form action="activate_app" method="POST">
+    %if not app.notified:
+    {{app.name}} does not receive presence notifications.
+
+    <input type="submit" name="activate" value="Activate"/>
+    %end
+    %if app.notified:
+    {{app.name}} receives presence notifications.
+
+    <input type="submit" name="deactivate" value="Deactivate"/>
+    %end
+    <input type="hidden" name="name" value="{{app.name}}"/>
+  </form>
+  </div>
+
+  </div>
+  %end
+
   %if not app.valid_domain:
   <strong>Not validated</strong>
   <p>To validate the application, you need to add a file at
@@ -47,7 +72,11 @@
 
   <p>Then click on the validate button below</p>
 
-  <button name="validate">Validate</button>
+  <form action="validate_app" method="POST">
+    <button name="validate">Validate</button>
+    <input type="hidden" name="name" value="{{app.name}}"/>
+  </form>
+
   %end
   </div>
 %end

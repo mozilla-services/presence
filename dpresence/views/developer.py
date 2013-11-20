@@ -31,3 +31,33 @@ def post_app(db):
     db.add(app)
 
     redirect('/myapps')
+
+@post('/validate_app')
+def validate_app(db):
+    email = get_user()
+    if email is None:
+        abort(401, "Authorization required")
+
+    # XXX CRSF protection etc..
+    name = request.POST['name']
+    app = db.query(Application).filter_by(email=email, name=name)
+    app = app.first()
+    if app is not None:
+        app.validate_domain()
+
+    redirect('/myapps')
+
+@post('/activate_app')
+def activate_app(db):
+    email = get_user()
+    if email is None:
+        abort(401, "Authorization required")
+
+    # XXX CRSF protection etc..
+    name = request.POST['name']
+    app = db.query(Application).filter_by(email=email, name=name)
+    app = app.first()
+    if app is not None:
+        app.notified = 'activate' in request.POST
+
+    redirect('/myapps')

@@ -43,7 +43,8 @@ class Application(Base):
         self.api_key = str(uuid.uuid4())
 
     def validate_domain(self):
-        raise NotImplementedError()
+        # XXX here we'll call domain/__presence
+        self.valid_domain = True
 
 
 class ApplicationUser(Base):
