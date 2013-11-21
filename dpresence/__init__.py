@@ -10,7 +10,12 @@ from bottle import *
 from bottle.ext.tornadosocket import TornadoWebSocketServer
 import tornado.web
 import tornado.websocket
+import tornado.wsgi, tornado.httpserver, tornado.ioloop
+
+from dpresence.database import db_plugin
 from dpresence.presence import Presence
+from dpresence.views.user import PresenceHandler
+
 
 STATIC = os.path.join(os.path.dirname(__file__), 'static')
 bottle.TEMPLATE_PATH = [os.path.join(os.path.dirname(__file__),
@@ -40,41 +45,9 @@ class AdminHandler(tornado.websocket.WebSocketHandler):
         self.write_message(dumps(event))
 
 
-class PresenceHandler(tornado.websocket.WebSocketHandler):
-    def __init__(self, *args, **kw):
-        tornado.websocket.WebSocketHandler.__init__(self, *args, **kw)
-        self._user = None
-
-    def get_username(self):
-        return self._user
-
-    def on_message(self, message):
-        message = loads(message)
-        self._user = user = message['user']
-        status = message['status']
-
-        if status in ('online', 'offline'):
-            if status == 'online':
-                app.dispatcher.add_client(self)
-            else:
-                app.dispatcher.remove_client(self)
-
-            self.write_message(dumps({"status": status,
-                                      "user": user}))
-        else:
-            self.write_message(dumps({"status": "error",
-                                      "user": user}))
-
-    def on_close(self):
-        app.dispatcher.remove_client(self)
-
 
 class TornadoWebSocketServer(ServerAdapter):
     def run(self, handler): # pragma: no cover
-        import tornado.wsgi, tornado.httpserver, tornado.ioloop
-        # installing sqlalchemy plugin
-        from dpresence.database import db_plugin
-
         wsgiapp = handler[0]
         wsgiapp.install(db_plugin)
         wsgiapp = beaker.middleware.SessionMiddleware(handler[0])
@@ -85,8 +58,10 @@ class TornadoWebSocketServer(ServerAdapter):
             (r".*", tornado.web.FallbackHandler, {'fallback': wsgi_handler})
         ]
 
-        if self.options['handlers'] is not None and isinstance(self.options['handlers'], list):
-            handlers = list(self.options['handlers']) + list(default_handlers)
+        handlers = self.options.get('handlers')
+
+        if isinstance(handlers, list):
+            handlers = handlers + default_handlers
         else:
             handlers = default_handlers
 
