@@ -1,7 +1,12 @@
 from json import dumps, loads
 
-from bottle import get, view, app, request, redirect, route
+from bottle import get, view, app, request, redirect, route, post, abort
+from bottle import HTTPResponse
+
 from tornado.websocket import WebSocketHandler
+
+from dpresence.views.common import get_user
+from dpresence.database import ApplicationUser
 
 
 class PresenceHandler(WebSocketHandler):
@@ -33,6 +38,34 @@ class PresenceHandler(WebSocketHandler):
 
     def on_close(self):
         app.dispatcher.remove_client(self)
+
+
+@get('/grant/<appid>')
+@view('grant')
+def grant(appid, db):
+    return {'title': 'Mozilla Presence',
+            'session': request.environ.get('beaker.session'),
+            'redirect': request.GET['redirect']}
+
+
+@post('/grant/<appid>')
+def post_grant(appid, db):
+    email = get_user()
+    if email is None:
+        abort(401, "Authorization required")
+
+
+    redirect_url = request.POST['redirect']
+
+    if 'allow' in request.POST:
+        app_user = ApplicationUser(appid, email)
+        db.add(app_user)
+        uid = app_user.uid
+        redirect_url += '?' + 'Presence-UID=%s' % str(uid)
+
+    code = 303 if request.get('SERVER_PROTOCOL') == "HTTP/1.1" else 302
+    response = HTTPResponse("", status=code, Location=redirect_url)
+    raise response
 
 
 @get('/')

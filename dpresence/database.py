@@ -59,10 +59,10 @@ class ApplicationUser(Base):
     id = Column(Integer, Sequence('id_seq2'), primary_key=True)
 
     email = Column(String(200))
-    application = Column(String(200))
+    appid = Column(String(200))
     uid = Column(Integer)
 
     def __init__(self, application, email):
-        self.application = application
+        self.appid = application
         self.email = email
         self.uid = str(uuid.uuid4())

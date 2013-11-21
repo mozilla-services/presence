@@ -5,11 +5,12 @@
   <title>{{title}}</title>
   <script src="/js/jquery-1.7.2.min.js"></script>
   <script src="/js/persona.js"></script>
-  <script src="/js/browserDetection.js"></script>
   <link rel="stylesheet" media="all" href="/css/presence.css"/>
 
 </head>
 <body style="width: 300px; height: 400px">
+
+
 <header id="login">
   <h1 class="title">Mozilla Presence</h1>
   <span id="user">{{session.get('email', '')}}</span>
@@ -47,16 +48,16 @@
   </div>
 
   <script>
-      var signinLink = document.getElementById('signin');
-      if (signinLink) {
-          signinLink.onclick = function() { navigator.id.request(); };
-        }
+var signinLink = document.getElementById('signin');
+if (signinLink) {
+  signinLink.onclick = function() { navigator.id.request(); };
+}
 
-        var signoutLink = document.getElementById('signout');
-        if (signoutLink) {
-            signoutLink.onclick = function() { navigator.id.logout(); };
-          }
-
+var signoutLink = document.getElementById('signout');
+if (signoutLink) {
+    signoutLink.onclick = function() { navigator.id.logout(); };
+    }
+console.log('here');
 
 %if session.get('logged_in'):
 var currentUser = '{{session['email']}}';
@@ -64,20 +65,19 @@ var currentUser = '{{session['email']}}';
 var currentUser = null;
 %end
 
+var ws = new WebSocket('ws://localhost:8282/presence');
+ws.onmessage = function(evt) {
+  var data = jQuery.parseJSON(evt.data);
+  $('#status').text(data.status);
+};
 
-    var ws = new WebSocket('ws://localhost:8282/presence');
-      ws.onmessage = function(evt) {
-        var data = jQuery.parseJSON(evt.data);
-        $('#status').text(data.status);
-      };
+$('#online').click(function(){
+  ws.send(JSON.stringify({'status': 'online', 'user': currentUser}));
+});
 
-    $('#online').click(function(){
-      ws.send(JSON.stringify({'status': 'online', 'user': currentUser}));
-    });
-    $('#offline').click(function(){
-      ws.send(JSON.stringify({'status': 'offline', 'user': currentUser}));
-    });
-
+$('#offline').click(function(){
+  ws.send(JSON.stringify({'status': 'offline', 'user': currentUser}));
+});
 
 
 navigator.id.watch({
@@ -117,10 +117,10 @@ navigator.id.watch({
   }
 });
 
-browserDetection.initialize();
 
     </script>
 
 </body>
+
 </html>
 
