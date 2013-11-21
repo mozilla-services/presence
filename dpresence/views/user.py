@@ -1,3 +1,5 @@
+from json import dumps, loads
+
 from bottle import get, view, app, request, redirect, route
 from tornado.websocket import WebSocketHandler
 
@@ -38,6 +40,7 @@ class PresenceHandler(WebSocketHandler):
 def index(db):
     return {'title': 'Mozilla Presence',
             'session': request.environ.get('beaker.session')}
+
 
 @get('/sidebar')
 @view('sidebar')

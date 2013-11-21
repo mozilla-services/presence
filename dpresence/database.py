@@ -3,6 +3,8 @@ import uuid
 from sqlalchemy import (create_engine, Column, Integer, Sequence, String,
                         Text, Boolean)
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
 from bottle.ext import sqlalchemy
 
 
@@ -10,6 +12,10 @@ Base = declarative_base()
 engine = create_engine('sqlite:////tmp/presence.db', echo=True)
 db_plugin = sqlalchemy.Plugin(engine, Base.metadata, keyword='db',
                               create=True, commit=True, use_kwargs=True)
+
+
+def get_session():
+    return sessionmaker()(bind=engine)
 
 
 class Application(Base):

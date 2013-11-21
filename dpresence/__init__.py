@@ -15,6 +15,8 @@ import tornado.wsgi, tornado.httpserver, tornado.ioloop
 from dpresence.database import db_plugin
 from dpresence.presence import Presence
 from dpresence.views.user import PresenceHandler
+from dpresence.views.developer import AppHandler
+
 
 
 STATIC = os.path.join(os.path.dirname(__file__), 'static')
@@ -45,7 +47,6 @@ class AdminHandler(tornado.websocket.WebSocketHandler):
         self.write_message(dumps(event))
 
 
-
 class TornadoWebSocketServer(ServerAdapter):
     def run(self, handler): # pragma: no cover
         wsgiapp = handler[0]
@@ -73,6 +74,7 @@ class TornadoWebSocketServer(ServerAdapter):
 def main(port=8282, reloader=True):
     tornado_handlers = [
         (r"/presence", PresenceHandler),
+        (r"/myapps/(.*)", AppHandler),
         (r"/_admin", AdminHandler),
         (r"/js/(.*)", tornado.web.StaticFileHandler,
          {"path": os.path.join(STATIC, 'js')}),
