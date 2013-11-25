@@ -46,7 +46,8 @@
     <button id="offline">Go Offline</button>
    </div>
   </div>
-
+  <button id="notify">Notify</button>
+   
   <script>
 var signinLink = document.getElementById('signin');
 if (signinLink) {
@@ -66,8 +67,13 @@ var currentUser = null;
 %end
 
 var ws = new WebSocket('ws://localhost:8282/presence');
+
 ws.onmessage = function(evt) {
   var data = jQuery.parseJSON(evt.data);
+  if (data.status=='notification') {
+    notify('Someone wants to talk to you');
+    return;
+  }
   $('#status').text(data.status);
 };
 
@@ -77,6 +83,11 @@ $('#online').click(function(){
 
 $('#offline').click(function(){
   ws.send(JSON.stringify({'status': 'offline', 'user': currentUser}));
+});
+
+$('#notify').click(function(){
+  // XXX will be plugged by the ws
+  notify("Someone wants to talk to you");
 });
 
 
@@ -117,7 +128,22 @@ navigator.id.watch({
   }
 });
 
+var baselocation = location.href.substr(0, location.href.indexOf("sidebar"));
 
+function notify(msg) {
+  var port = navigator.mozSocial.getWorker().port;
+  data = {
+    id: "foo",
+    type: null,
+    icon: baselocation+"/icon.png",
+    body: msg,
+    action: "link",
+    actionArgs: {
+        toURL: 'http://localhost:8080'
+      }
+    }
+    port.postMessage({topic:"social.notification-create", data: data});
+}
     </script>
 
 </body>

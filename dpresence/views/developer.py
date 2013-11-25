@@ -54,25 +54,20 @@ class AppHandler(WebSocketHandler):
     def _can_see_user(self, email, app_uid):
         # XXX todo: return the user uid
         # given the user email and app id
-        # this is located in ApplicationUser
+        # this is located in ApplicationUse
         db = get_session()
         app_user = db.query(ApplicationUser).filter_by(email=email)
-        app_user = app_user.filter_by(appid=app_uid).first()
+        app_user = app_user.first()
+        #app_user = app_user.filter_by(appid=app_uid).first()
         if app_user is None:
             return None
-        return app_user.uid
+        return app_user.email   #uid
 
     def _event(self, event):
         # here we will allow the connection to see the presence
         # change if the user has allowed that app to see her
         if self.application is None:
-            db = get_session()
-            apps = db.query(Application).filter_by(uid=appid)
-            self.application = apps.first()
-            if self.application is None:
-                self.close()
-                return
-
+            return
         user_uid = self._can_see_user(event['user'], self.application.uid)
 
         if user_uid is not None:

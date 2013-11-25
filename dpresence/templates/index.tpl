@@ -30,12 +30,12 @@
     "iconURL": baseurl+"/img/presence16.png",
     "icon32URL": baseurl+"/img/presence32.png",
     "icon64URL": baseurl+"/img/presence64.png",
-
     "sidebarURL": baseurl+"/sidebar",
-
     "description": "Chat Room",
     "author": "Mozilla",
     "homepageURL": "https://wiki.mozilla.org/CloudServices/Presence",
+
+    "workerURL": baseurl+"/js/worker.js",
 
     // optional
     "version": "1.0"

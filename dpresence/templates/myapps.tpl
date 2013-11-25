@@ -38,7 +38,12 @@
   <div class="app">
   <h4>{{app.name}}</h4>
   <p>{{app.description}}</p>
+  <div>app uid:
+    <pre>{{app.uid}}</pre>
+  </div>
+
   <div>Domain: <a href="{{app.domain}}">{{app.domain}}</a></div>
+  <br/>
   %if app.valid_domain:
   <div>
     API Key:
@@ -48,11 +53,12 @@
   <form action="activate_app" method="POST">
     %if not app.notified:
     {{app.name}} does not receive presence notifications.
-
+    <br/><br/>
     <input type="submit" name="activate" value="Activate"/>
     %end
     %if app.notified:
     {{app.name}} receives presence notifications.
+    <br/><br/>
 
     <input type="submit" name="deactivate" value="Deactivate"/>
     %end
