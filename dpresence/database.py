@@ -1,4 +1,5 @@
 import uuid
+from collections import defaultdict
 
 from sqlalchemy import (create_engine, Column, Integer, Sequence, String,
                         Text, Boolean)
@@ -66,3 +67,17 @@ class ApplicationUser(Base):
         self.appid = application
         self.email = email
         self.uid = str(uuid.uuid4())
+
+
+
+_NOTIFICATIONS = defaultdict(list)
+
+def push_notification(notification):
+    _NOTIFICATIONS[notification['target']].append(notification)
+
+
+def pop_notifications(email):
+    try:
+        return list(_NOTIFICATIONS[email])
+    finally:
+        _NOTIFICATIONS[email] = []

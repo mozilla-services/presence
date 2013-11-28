@@ -4,7 +4,7 @@ from bottle import get, view, app, request, redirect, route, post, abort
 from tornado.websocket import WebSocketHandler
 
 from dpresence.database import Application, get_session
-from dpresence.database import ApplicationUser
+from dpresence.database import ApplicationUser, push_notification
 from dpresence.views.common import get_user
 
 
@@ -27,6 +27,9 @@ class AppHandler(WebSocketHandler):
             #                          'action': action}))
             self.connected = True
             return
+        elif action == 'notify':
+            # we're queuing a notification
+            push_notification(message)
 
         if not self.connected:
             # we're supposed to be connected here

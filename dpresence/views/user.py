@@ -1,12 +1,14 @@
+import time
 from json import dumps, loads
 
 from bottle import get, view, app, request, redirect, route, post, abort
 from bottle import HTTPResponse
 
 from tornado.websocket import WebSocketHandler
+from tornado.ioloop import IOLoop
 
 from dpresence.views.common import get_user
-from dpresence.database import ApplicationUser
+from dpresence.database import ApplicationUser, pop_notifications
 
 
 class PresenceHandler(WebSocketHandler):
@@ -15,6 +17,22 @@ class PresenceHandler(WebSocketHandler):
     def __init__(self, *args, **kw):
         WebSocketHandler.__init__(self, *args, **kw)
         self._user = None
+        self._closed = False
+        IOLoop.instance().add_timeout(time.time() + 5,
+                                      self._check_notifications)
+
+    def _check_notifications(self):
+        if self._user is not None:
+            notifications = pop_notifications(self._user)
+            if len(notifications) > 0:
+                self.write_message(dumps({"status": "notification",
+                                          "user": self._user,
+                                          "notifications": notifications}))
+
+        # back in 5'
+        if not self._closed:
+            IOLoop.instance().add_timeout(time.time() + 5,
+                                          self._check_notifications)
 
     def get_username(self):
         return self._user
@@ -38,6 +56,7 @@ class PresenceHandler(WebSocketHandler):
 
     def on_close(self):
         app.dispatcher.remove_client(self)
+        self._closed = True
 
 
 @get('/grant/<appid>')

@@ -5,12 +5,11 @@
   <title>{{title}}</title>
   <script src="/js/jquery-1.7.2.min.js"></script>
   <script src="/js/persona.js"></script>
+  <script src="/js/browserDetection.js"></script>
   <link rel="stylesheet" media="all" href="/css/presence.css"/>
 
 </head>
 <body style="width: 300px; height: 400px">
-
-
 <header id="login">
   <h1 class="title">Mozilla Presence</h1>
   <span id="user">{{session.get('email', '')}}</span>
@@ -36,29 +35,28 @@
 %end
 </header>
 
-%if session.get('logged_in'):
-  <div class="status"><span id="status">offline</span>
-%else:
-  <div class="status" style="display: none"><span id="status">offline</span>
-%end
-   <div>
-    <button id="online">Go Online</button>
-    <button id="offline">Go Offline</button>
-   </div>
+<form action="" method="POST">
+
+  <h3>Allow ChatRoom to see when you are present ?</h3>
+  <div>
+    <input type="hidden" name="redirect" value="{{redirect}}"/>
+    <input type="submit" name="allow" value="Yes"/>
+    <input type="submit" name="disallow" value="No"/>
   </div>
-  <button id="notify">Notify</button>
+</form>
+
 
   <script>
-var signinLink = document.getElementById('signin');
-if (signinLink) {
-  signinLink.onclick = function() { navigator.id.request(); };
-}
+      var signinLink = document.getElementById('signin');
+      if (signinLink) {
+          signinLink.onclick = function() { navigator.id.request(); };
+        }
 
-var signoutLink = document.getElementById('signout');
-if (signoutLink) {
-    signoutLink.onclick = function() { navigator.id.logout(); };
-    }
-console.log('here');
+        var signoutLink = document.getElementById('signout');
+        if (signoutLink) {
+            signoutLink.onclick = function() { navigator.id.logout(); };
+          }
+
 
 %if session.get('logged_in'):
 var currentUser = '{{session['email']}}';
@@ -66,32 +64,6 @@ var currentUser = '{{session['email']}}';
 var currentUser = null;
 %end
 
-var ws = new WebSocket('ws://localhost:8282/presence');
-
-ws.onmessage = function(evt) {
-  var data = jQuery.parseJSON(evt.data);
-
-  if (data.status=='notification') {
-    $.each(data.notifications, function(key, notification){
-       notify(notification.message);
-    });
-    return;
-  }
-  $('#status').text(data.status);
-};
-
-$('#online').click(function(){
-  ws.send(JSON.stringify({'status': 'online', 'user': currentUser}));
-});
-
-$('#offline').click(function(){
-  ws.send(JSON.stringify({'status': 'offline', 'user': currentUser}));
-});
-
-$('#notify').click(function(){
-  // XXX will be plugged by the ws
-  notify("Someone wants to talk to you");
-});
 
 
 navigator.id.watch({
@@ -104,7 +76,6 @@ navigator.id.watch({
       data: {assertion: assertion},
       success: function(res, status, xhr) {
         $('#signin').hide();
-        $('div.status').show();
         $('#signout').show();
         $('#user').text(res.email);
         currentUser = res.email;
@@ -121,7 +92,6 @@ navigator.id.watch({
       url: '/logout', // This is a URL on your website.
       success: function(res, status, xhr) {
         $('#signin').show();
-        $('div.status').hide();
         $('#signout').hide();
         $('#user').text('');
         currentUser = null;
@@ -131,25 +101,10 @@ navigator.id.watch({
   }
 });
 
-var baselocation = location.href.substr(0, location.href.indexOf("sidebar"));
+browserDetection.initialize();
 
-function notify(msg) {
-  var port = navigator.mozSocial.getWorker().port;
-  data = {
-    id: "foo",
-    type: null,
-    icon: baselocation+"/icon.png",
-    body: msg,
-    action: "link",
-    actionArgs: {
-        toURL: 'http://localhost:8080'
-      }
-    }
-    port.postMessage({topic:"social.notification-create", data: data});
-}
     </script>
 
 </body>
-
 </html>
 
