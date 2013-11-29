@@ -50,7 +50,7 @@
     <h2 class="title">Apps permissions</h2>
     <ul id="applist">
     %for app in apps:
-      <li>{{app['name']}}<button>Revoke</button>
+      <li>{{app['name']}}<button onclick="revokeApp('{{app['uid']}}')">Revoke</button>
     </li>
     %end
     </ul>

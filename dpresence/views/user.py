@@ -80,7 +80,6 @@ def grant(appid, db):
             'session': request.environ.get('beaker.session'),
             'redirect': request.GET['redirect']}
 
-
 @post('/grant/<appid>')
 def post_grant(appid, db):
     email = get_user()
@@ -123,12 +122,27 @@ def _get_apps(db):
     else:
         apps = []
 
-    return [{'name': app.name} for app in apps]
+    return [{'name': app.name, 'uid': app.uid} for app in apps]
 
 
 @route('/getApps', method='GET')
 def get_apps(db):
     return {'apps': _get_apps(db)}
+
+
+def _revoke_apps(db, appid):
+    email = get_user()
+    if email is None:
+        return {'result': 'error'}
+
+    apps = db.query(ApplicationUser).filter_by(email=email, appid=appid)
+    apps.delete()
+    return {'result': 'OK'}
+
+
+@post('/revoke/<appid>', method='GET')
+def revoke(appid, db):
+    return _revoke_apps(db, appid)
 
 
 @get('/sidebar')

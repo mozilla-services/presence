@@ -1,23 +1,29 @@
 
 function loadApps() {
-
   $.getJSON("getApps", function(data) {
-
      var ul = "<ul id='applist'>";
-
      $.each(data.apps, function(key, app) {
-       ul += '<li>' + app.name + '<button>Revoke</button></li>\n';
-       }
+       var revoke = "<button onclick=\"revokeApp('" + app.uid + "')\">";
+       revoke += "Revoke</button>";
 
+       ul += '<li>' + app.name + revoke + '</li>\n';
+       }
      );
     ul += '</ul>';
     $('#applist').replaceWith(ul);
-
   });
-
-
 }
 
+function revokeApp(appid) {
+  $.getJSON("/revoke/" + appid, function(data) {
+     if (data.result == 'OK') {
+       loadApps();
+     } else {
+       alert(data.result);
+     }
+  });
+
+}
 
 var signinLink = document.getElementById('signin');
 if (signinLink) {
