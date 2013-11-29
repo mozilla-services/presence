@@ -36,110 +36,38 @@
 %end
 </header>
 
-%if session.get('logged_in'):
-  <div class="status"><span id="status">offline</span>
-%else:
-  <div class="status" style="display: none"><span id="status">offline</span>
-%end
+
+ <div class="status" style="display: none">
+  <h2 class="title">Status</h2>
+  <span id="status">offline</span>
    <div>
     <button id="online">Go Online</button>
     <button id="offline">Go Offline</button>
    </div>
   </div>
 
-  <script>
-var signinLink = document.getElementById('signin');
-if (signinLink) {
-  signinLink.onclick = function() { navigator.id.request(); };
-}
+  <div class="apps" id="apps" style="display: none">
+    <h2 class="title">Apps permissions</h2>
+    <ul id="applist">
+    %for app in apps:
+      <li>{{app['name']}}<button>Revoke</button>
+    </li>
+    %end
+    </ul>
+  </div>
 
-var signoutLink = document.getElementById('signout');
-if (signoutLink) {
-    signoutLink.onclick = function() { navigator.id.logout(); };
-    }
-console.log('here');
 
+<script>
 %if session.get('logged_in'):
-var currentUser = '{{session['email']}}';
+currentUser = '{{session['email']}}';
 %else:
-var currentUser = null;
+currentUser = null;
 %end
+</script>
 
-var ws = new WebSocket('ws://localhost:8282/presence');
+  <script src="/js/presence.js"></script>
 
-ws.onmessage = function(evt) {
-  var data = jQuery.parseJSON(evt.data);
 
-  if (data.status=='notification') {
-    $.each(data.notifications, function(key, notification){
-       notify(notification.message);
-    });
-    return;
-  }
-  $('#status').text(data.status);
-};
-
-$('#online').click(function(){
-  ws.send(JSON.stringify({'status': 'online', 'user': currentUser}));
-});
-
-$('#offline').click(function(){
-  ws.send(JSON.stringify({'status': 'offline', 'user': currentUser}));
-});
-
-navigator.id.watch({
-  loggedInUser: currentUser,
-  onlogin: function(assertion) {
-    $.ajax({
-      type: 'POST',
-      url: '/login',
-      dataType: 'json',
-      data: {assertion: assertion},
-      success: function(res, status, xhr) {
-        $('#signin').hide();
-        $('div.status').show();
-        $('#signout').show();
-        $('#user').text(res.email);
-        currentUser = res.email;
-      },
-      error: function(xhr, status, err) {
-        navigator.id.logout();
-        alert("Login failure: " + err);
-      }
-    });
-  },
-  onlogout: function() {
-    $.ajax({
-      type: 'POST',
-      url: '/logout', // This is a URL on your website.
-      success: function(res, status, xhr) {
-        $('#signin').show();
-        $('div.status').hide();
-        $('#signout').hide();
-        $('#user').text('');
-        currentUser = null;
-      },
-      error: function(xhr, status, err) { alert("Logout failure: " + err); }
-    });
-  }
-});
-
-var baselocation = location.href.substr(0, location.href.indexOf("sidebar"));
-
-function notify(msg) {
-  var port = navigator.mozSocial.getWorker().port;
-  data = {
-    id: "foo",
-    type: null,
-    body: msg,
-    action: "link",
-    actionArgs: {
-        toURL: baselocation + "redirect?url=http://localhost:8080"
-      }
-    }
-    port.postMessage({topic:"social.notification-create", data: data});
-}
-    </script>
 
 </body>
 

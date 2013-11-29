@@ -8,7 +8,7 @@ from tornado.websocket import WebSocketHandler
 from tornado.ioloop import IOLoop
 
 from dpresence.views.common import get_user
-from dpresence.database import ApplicationUser, pop_notifications
+from dpresence.database import ApplicationUser, pop_notifications, Application
 
 
 class PresenceHandler(WebSocketHandler):
@@ -108,11 +108,35 @@ def index(db):
             'session': request.environ.get('beaker.session')}
 
 
+def _get_apps(db):
+    email = get_user()
+    if email is not None:
+        # XXX will do a join or something
+
+        app_ids = [app.appid for app in
+                    db.query(ApplicationUser).filter_by(email=email)]
+        if app_ids == []:
+            apps = []
+        else:
+            in_ = Application.__table__.c.uid.in_
+            apps = db.query(Application).filter(in_(app_ids))
+    else:
+        apps = []
+
+    return [{'name': app.name} for app in apps]
+
+
+@route('/getApps', method='GET')
+def get_apps(db):
+    return {'apps': _get_apps(db)}
+
+
 @get('/sidebar')
 @view('sidebar')
 def sidebar(db):
     return {'title': 'Mozilla Presence',
-            'session': request.environ.get('beaker.session')}
+            'session': request.environ.get('beaker.session'),
+            'apps': _get_apps(db)}
 
 
 @get('/admin')

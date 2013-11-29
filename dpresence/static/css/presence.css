@@ -10,11 +10,21 @@ body {
 
 }
 
-header {
+header, div.status, #apps {
   padding: 4px 10px;
   background: #F5F1E8;
   border-bottom: 1px solid #ccc;
+  width: 100%;
+  margin-bottom: 2px;
 }
+
+ul {
+  list-style-type: none;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
 
 #signin img {
   width: 185px;
@@ -26,13 +36,7 @@ header {
   font-size: 20px;
   font-weight: normal;
   color: #818A8F;
-}
-
-div.status {
-  margin: 15px;
-  margin-left: 2px;
-  font-size: 20pt;
-  color: #818A8F;
+  border-bottom: 1px solid #818A8F;
 }
 
 div.app h4, div.add h4 {
