@@ -46,7 +46,6 @@
     <button id="offline">Go Offline</button>
    </div>
   </div>
-  <button id="notify">Notify</button>
 
   <script>
 var signinLink = document.getElementById('signin');
@@ -87,12 +86,6 @@ $('#online').click(function(){
 $('#offline').click(function(){
   ws.send(JSON.stringify({'status': 'offline', 'user': currentUser}));
 });
-
-$('#notify').click(function(){
-  // XXX will be plugged by the ws
-  notify("Someone wants to talk to you");
-});
-
 
 navigator.id.watch({
   loggedInUser: currentUser,
