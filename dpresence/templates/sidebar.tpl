@@ -138,11 +138,10 @@ function notify(msg) {
   data = {
     id: "foo",
     type: null,
-    icon: baselocation+"/icon.png",
     body: msg,
     action: "link",
     actionArgs: {
-        toURL: 'http://localhost:8080'
+        toURL: baselocation + "redirect?url=http://localhost:8080"
       }
     }
     port.postMessage({topic:"social.notification-create", data: data});

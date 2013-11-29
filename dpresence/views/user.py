@@ -59,6 +59,20 @@ class PresenceHandler(WebSocketHandler):
         self._closed = True
 
 
+@get('/redirect')
+def redirect():
+    redirect_url = request.GET.get('url', '/')
+    code = 303 if request.get('SERVER_PROTOCOL') == "HTTP/1.1" else 302
+    response = HTTPResponse("", status=code, Location=redirect_url)
+    raise response
+
+
+    return {'title': 'Mozilla Presence',
+            'session': request.environ.get('beaker.session'),
+            'redirect': request.GET['redirect']}
+
+
+
 @get('/grant/<appid>')
 @view('grant')
 def grant(appid, db):
