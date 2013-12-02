@@ -11,6 +11,9 @@ from dpresence.views.common import get_user
 from dpresence.database import ApplicationUser, pop_notifications, Application
 
 
+#
+# web socket at /presence
+#
 class PresenceHandler(WebSocketHandler):
     """Handles the user presence
     """
@@ -58,6 +61,10 @@ class PresenceHandler(WebSocketHandler):
         app.dispatcher.remove_client(self)
         self._closed = True
 
+
+#
+# apps permissions APIs
+#
 
 @get('/redirect')
 def redirect():

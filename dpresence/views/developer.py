@@ -109,8 +109,8 @@ def post_app(db):
     data['email'] = email
     app = Application(**data)
     db.add(app)
-
     redirect('/myapps')
+
 
 @post('/validate_app')
 def validate_app(db):
