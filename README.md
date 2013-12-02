@@ -18,7 +18,7 @@ The server provides:
 Device Presence Channel
 -----------------------
 
-The Device Presence Channel is a web socket at wss://<server>/presence
+The Device Presence Channel is a web socket at *wss://server/presence*
 
 It's a channel of communications between a phone/browser device and Mozilla
 Presence that carries live notifications from Presence and presence data to
@@ -90,7 +90,7 @@ AppService Presence Channel
 ---------------------------
 
 
-The AppService Channel is a web socket at wss://<server>/myapps/<appid>
+The AppService Channel is a web socket at *wss://server/myapps/<appid>*
 
 It's a channel of communication between Mozilla Presence and an AppService that
 carries presence updates for users sharing their presence with the AppService
