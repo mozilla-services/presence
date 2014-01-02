@@ -27,6 +27,7 @@ def login():
 def logout():
     app_session = request.environ.get('beaker.session')
     app_session['logged_in'] = False
-    del app_session['email']
+    if 'email' in app_session:
+        del app_session['email']
     app_session.save()
     redirect("/")
