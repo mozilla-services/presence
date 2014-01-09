@@ -11,12 +11,14 @@ from bottle.ext import sqlalchemy
 
 Base = declarative_base()
 engine = create_engine('sqlite:////tmp/presence.db', echo=True)
+
 db_plugin = sqlalchemy.Plugin(engine, Base.metadata, keyword='db',
                               create=True, commit=True, use_kwargs=True)
 
 
 def get_session():
     return sessionmaker()(bind=engine)
+
 
 
 class Application(Base):
@@ -81,3 +83,6 @@ def pop_notifications(email):
         return list(_NOTIFICATIONS[email])
     finally:
         _NOTIFICATIONS[email] = []
+
+
+Base.metadata.create_all(engine, checkfirst=True)
