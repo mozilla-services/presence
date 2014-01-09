@@ -42,6 +42,7 @@ class PresenceHandler(WebSocketHandler):
 
     def on_message(self, message):
         message = loads(message)
+        print message
         self._user = user = message['user']
         status = message['status']
 

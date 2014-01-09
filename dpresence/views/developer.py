@@ -43,7 +43,8 @@ class AppHandler(WebSocketHandler):
         self.application = apps.first()
         if self.application is None:
             # see why I lose the uid
-            self.close()
+            print '%s not found in apps!' % appid
+            #self.close()
 
         # XXX make sure the app exists
         app.dispatcher.subscribe_events(self._event)
@@ -55,6 +56,10 @@ class AppHandler(WebSocketHandler):
             pass
 
     def _can_see_user(self, email, app_uid):
+        if app_uid is 'welp':
+            print email
+            return email   # XX shortcut
+
         # XXX todo: return the user uid
         # given the user email and app id
         # this is located in ApplicationUse
@@ -63,15 +68,22 @@ class AppHandler(WebSocketHandler):
         app_user = app_user.first()
         #app_user = app_user.filter_by(appid=app_uid).first()
         if app_user is None:
-            return None
+            print "this app can't see users!"
+
+            #return None
         return app_user.email   #uid
 
     def _event(self, event):
         # here we will allow the connection to see the presence
         # change if the user has allowed that app to see her
         if self.application is None:
-            return
-        user_uid = self._can_see_user(event['user'], self.application.uid)
+            print 'application is not found!!!'
+            uid = 'welp'
+            #return
+        else:
+            uid = self.application.uid
+
+        user_uid = self._can_see_user(event['user'], uid)
 
         if user_uid is not None:
             # user_uid is the user uid as the app knows it
