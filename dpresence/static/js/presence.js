@@ -36,7 +36,7 @@ if (signoutLink) {
     }
 
 var currentUser = null;
-var ws = new WebSocket('ws://localhost:8282/presence');
+ws = new WebSocket('ws://localhost:8282/presence');
 
 ws.onmessage = function(evt) {
   var data = jQuery.parseJSON(evt.data);

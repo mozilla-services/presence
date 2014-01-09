@@ -1,4 +1,5 @@
 var apiPort;
+var ws = null;
 
 
 onconnect = function(e) {
