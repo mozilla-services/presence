@@ -7,7 +7,7 @@
   <script>
   $(function() {
 
-    var ws = new WebSocket('ws://localhost:8282/_admin');
+    var ws = new WebSocket('ws://presence.services.mozilla.com/_presence/_admin');
       ws.onmessage = function(evt) {
         $('#events').val($('#events').val() + '\n' + evt.data);
       };
