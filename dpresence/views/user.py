@@ -18,19 +18,34 @@ class PresenceHandler(WebSocketHandler):
     """Handles the user presence
     """
     def __init__(self, *args, **kw):
+        print 'Presence handler created'
         WebSocketHandler.__init__(self, *args, **kw)
         self._user = None
         self._closed = False
         IOLoop.instance().add_timeout(time.time() + 5,
                                       self._check_notifications)
+    def open(self):
+        print 'web socket opened'    
+        msg = {'message': 'welcome'}
+        self.write_message(dumps({"status": "notification",
+                                  "user": "root",
+                                  "notifications": [msg]}))
+
+ 
 
     def _check_notifications(self):
+        print '_check_notifications'
         if self._user is not None:
+            print '_check_notifications %s connected' % self._user
             notifications = pop_notifications(self._user)
             if len(notifications) > 0:
+                print '%s got some, sending' % self._user
                 self.write_message(dumps({"status": "notification",
                                           "user": self._user,
                                           "notifications": notifications}))
+        else:
+            # anonymous user, let's drop it
+            print '_check_notification anonymous user.. dropping'
 
         # back in 5'
         if not self._closed:
@@ -41,8 +56,8 @@ class PresenceHandler(WebSocketHandler):
         return self._user
 
     def on_message(self, message):
+        print 'received ' + message
         message = loads(message)
-        print message
         self._user = user = message['user']
         status = message['status']
 

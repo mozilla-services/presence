@@ -36,6 +36,7 @@ def login(db=None):
     except ValueError, UnicodeDecodeError:
         # need to raise a auth
         pass
+    print 'logged in with ' + email
     return {'email': email}
 
 
