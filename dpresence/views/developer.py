@@ -17,6 +17,7 @@ class AppHandler(WebSocketHandler):
         self.application = None
 
     def on_message(self, message):
+        print 'received %s from app' % message
         message = loads(message)
         action = message.get('action')
 
@@ -92,6 +93,7 @@ class AppHandler(WebSocketHandler):
             event['uid'] = user_uid
 
             # sends events as they come (status changes in presence)
+            print 'sending ' + dumps(event)
             self.write_message(dumps(event))
 
 

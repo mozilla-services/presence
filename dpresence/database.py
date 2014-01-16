@@ -10,7 +10,7 @@ from bottle.ext import sqlalchemy
 
 
 Base = declarative_base()
-engine = create_engine('sqlite:////tmp/presence.db', echo=True)
+engine = create_engine('sqlite:////tmp/presence.db', echo=False)
 
 db_plugin = sqlalchemy.Plugin(engine, Base.metadata, keyword='db',
                               create=True, commit=True, use_kwargs=True)
