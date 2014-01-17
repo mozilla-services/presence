@@ -3,10 +3,9 @@
  <head>
   <meta charset="utf-8">
   <title>{{title}}</title>
-  <script src="/js/jquery-1.7.2.min.js"></script>
-  <script src="/js/persona.js"></script>
-  <script src="/js/browserDetection.js"></script>
-  <link rel="stylesheet" media="all" href="/css/presence.css"/>
+  <script src="{{root_url}}/js/jquery-1.7.2.min.js"></script>
+  <script src="{{root_url}}/js/persona.js"></script>
+  <link rel="stylesheet" media="all" href="{{root_url}}/css/presence.css"/>
 
 </head>
 <body style="width: 300px; height: 400px">
@@ -18,11 +17,11 @@
       <p>
 %if session.get('logged_in'):
         <a href="#" id="signin" style="display: none">
-          <img src="/img/persona_sign_in_blue.png" alt="Sign in with Persona">
+          <img src="{{root_url}}/img/persona_sign_in_blue.png" alt="Sign in with Persona">
         </a>
 %else:
         <a href="#" id="signin">
-          <img src="/img/persona_sign_in_blue.png" alt="Sign in with Persona">
+          <img src="{{root_url}}/img/persona_sign_in_blue.png" alt="Sign in with Persona">
         </a>
 
 %end
@@ -71,7 +70,7 @@ navigator.id.watch({
   onlogin: function(assertion) {
     $.ajax({
       type: 'POST',
-      url: '/login',
+      url: '{{root_url}}/login',
       dataType: 'json',
       data: {assertion: assertion},
       success: function(res, status, xhr) {
@@ -89,7 +88,7 @@ navigator.id.watch({
   onlogout: function() {
     $.ajax({
       type: 'POST',
-      url: '/logout', // This is a URL on your website.
+      url: '{{root_url}}/logout', // This is a URL on your website.
       success: function(res, status, xhr) {
         $('#signin').show();
         $('#signout').hide();
@@ -101,7 +100,6 @@ navigator.id.watch({
   }
 });
 
-browserDetection.initialize();
 
     </script>
 

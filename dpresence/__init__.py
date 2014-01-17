@@ -84,7 +84,8 @@ def main(port=8282, reloader=True):
          {"path": os.path.join(STATIC, 'css')}),
 
     ]
-
+    from bottle import SimpleTemplate
+    SimpleTemplate.defaults["root_url"] = 'http://presence.services.mozilla.com/_presence'
     app.dispatcher = Presence()
     app.verifier = browserid.LocalVerifier(['*'])
 

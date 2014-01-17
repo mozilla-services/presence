@@ -99,6 +99,9 @@ def redirect():
 @get('/grant/<appid>')
 @view('grant')
 def grant(appid, db):
+    if 'redirect' not in request.GET:
+        raise HTTPResponse("", status=400)
+
     return {'title': 'Mozilla Presence',
             'session': request.environ.get('beaker.session'),
             'redirect': request.GET['redirect']}
